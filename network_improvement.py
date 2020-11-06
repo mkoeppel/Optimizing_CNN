@@ -17,10 +17,10 @@ dataset = cifar10
 no_classes = 10
 batch_size = 300
 validation_split = 0.2
-epochs = 4
+epochs = 10
 threshold = 0.9
-population = 8
-generations = 2
+population = 24
+generations = 50
 input_shape = (32, 32, 3)
 
 padding = ZeroPadding2D()
