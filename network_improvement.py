@@ -3,7 +3,7 @@ import logging
 import random
 import numpy as np
 from keras.models import Sequential
-from keras.layers import InputLayer, Dense, Activation, Dropout, Conv2D, MaxPooling2D, Flatten
+from keras.layers import InputLayer, Dense, Activation, Dropout, Conv2D, MaxPooling2D, Flatten, ZeroPadding2D
 from keras.datasets import cifar10
 from keras.utils import to_categorical
 
@@ -23,7 +23,7 @@ validation_split = 0.
 epochs = 10
 threshold = 0.9
 population = 20
-generations = 10
+generations = 50
 input_shape = (32, 32, 3)
 
 
@@ -49,65 +49,75 @@ class Network():
         """
         parameters to be optimized:
         """
-        self._layer2D = random.randint(0,4)
-        self._units2D = random.choice([16, 32, 64, 128])
-        self._stride = random.randint(1,4)
-        self._dropout2D = random.uniform(0.0, 0.3)
-        self._layerFull = random.randint(1,4)
-        self._unitsFull = random.choice([32, 64, 128])
-        self._dropoutFull = random.uniform(0.2, 0.5)
+        self._units2D_1 = random.choice([16, 32, 64, 128])
+        self._dropout2D_1 = random.uniform(0.0, 0.3)
+        self._kernel_1 = random.randint(3,5)
+        self._stride_1 = random.randint(1,3)
+        self._padding_1 =random.choice(['same', 'valid'])
+        self._units2D_2 = random.choice([16, 32, 64, 128])
+        self._dropout2D_2 = random.uniform(0.0, 0.3)
+        self._kernel_2 = random.randint(3,5)
+        self._stride_2 = random.randint(1,3)
+        self._padding_2 =random.choice(['same', 'valid'])
+
+        self._unitsFull_1 = random.choice([32, 64, 128])
+        self._dropoutFull_1 = random.uniform(0.2, 0.5)
+        self._unitsFull_2 = random.choice([32, 64, 128])
+        self._dropoutFull_2 = random.uniform(0.2, 0.5)
+
 
         """
         fixed parameters:
         """
         self._loss = 'categorical_crossentropy'
-        self._kernel = 3
         self._hidden_activation = 'relu'
         self._output_activation = 'softmax'
-        self._accuracy = 0.
         self._optimizer = 'adam'
+
+        self._accuracy = 0
 
     def create_model(self):
         """
         generates the actual models
 
         Params:
-            input: list of parametes givven above
+            input: list of parametes given above
             output: model containing a Pooling and a flattening layer + output for no_classes
         """
-        kernel = self._kernel
-        stride = self._stride
+        kernel_1 = (self._kernel_1, self._kernel_1)
+        strides_1 = (self._stride_1, self._stride_1)
+        kernel_2 = (self._kernel_2, self._kernel_2)
+        strides_2 = (self._stride_2, self._stride_2)
+
         model = Sequential()
         model.add(InputLayer(input_shape = input_shape))
-        if self._layer2D > 0:
-            for layer in range(self._layer2D):
-                model.add(Conv2D(self._units2D, kernel_size=(kernel, kernel), strides = (stride, stride), activation = self._hidden_activation))
-                model.add(Dropout(self._dropout2D))
-            model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
-            model.add(Flatten())
-        for layer in range(self._layerFull):
-            model.add(Dense(self._unitsFull, activation = self._hidden_activation))
-            model.add(Dropout(self._dropoutFull))
+        model.add(Conv2D(self._units2D_1, kernel_size= kernel_1, strides = strides_1, activation = self._hidden_activation))
+        model.add(Dropout(self._dropout2D_1))
+        model.add(Conv2D(self._units2D_2, kernel_size=kernel_2,strides = strides_1, activation = self._hidden_activation))
+        model.add(Dropout(self._dropout2D_2))
+        model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
+        model.add(Flatten())
+        model.add(Dense(self._unitsFull_1, activation = self._hidden_activation))
+        model.add(Dropout(self._dropoutFull_1))
+        model.add(Dense(self._unitsFull_2, activation = self._hidden_activation))
+        model.add(Dropout(self._dropoutFull_2))
         model.add(Dense(no_classes, activation = self._output_activation))
         model.compile(loss = self._loss, optimizer = self._optimizer, metrics = ['accuracy'])
+        model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=1)
 
         return model
 
 def init_networks(population):
     return [Network() for _ in range(population)]
 
-def run_model(model):
-    model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=1)
-    return model
-
 def assess_networks(networks):
     for network in networks:
         try:
-            model = network.create_model()
-            network = run_model(model)
-            accuracy = network.evaluate(test_images, test_labels)[1]
+            model = create_model(network)
+            accuracy = model.evaluate(test_images, test_labels, verbose=0)[1]
             network._accuracy = accuracy
             print('Accuracy: {}'.format(network._accuracy))
+
         except:
             network._accuracy = 0
             print ('Build failed.')
@@ -127,29 +137,28 @@ def rearrange_networks(networks):
         offspring1 = Network()
         offspring2 = Network()
 
-        # rearange layers
-        offspring1._layer2D = int((parent1._layer2D + parent2._layer2D)/2)
-        offspring1._layerFull = int((parent1._layerFull + parent2._layerFull)/2)
-        offspring2._layer2D = int((parent1._layer2D + parent2._layer2D)/2)
-        offspring2._layerFull = int((parent1._layerFull + parent2._layerFull)/2)
-
         # rearrage units
-        offspring1._units2D = int(parent1._units2D/2) + int(parent2._units2D)
-        offspring1._unitsFull = int(parent1._unitsFull/2) + int(parent2._unitsFull)
-        offspring2._units2D = int(parent1._units2D) + int(parent2._units2D/2)
-        offspring2._unitsFull = int(parent1._unitsFull) + int(parent2._unitsFull/2)
+        offspring1._units2D_1 = int(parent1._units2D_1/2) + int(parent2._units2D_1)
+        offspring1._unitsFull_1 = int(parent1._unitsFull_1/2) + int(parent2._unitsFull_1)
+        offspring2._units2D_1 = int(parent1._units2D_1) + int(parent2._units2D_1/2)
+        offspring2._unitsFull_1 = int(parent1._unitsFull_1) + int(parent2._unitsFull_1/2)
+
+        offspring1._units2D_2 = int(parent1._units2D_2/2) + int(parent2._units2D_2)
+        offspring1._unitsFull_2 = int(parent1._unitsFull_2/2) + int(parent2._unitsFull_2)
+        offspring2._units2D_2 = int(parent1._units2D_2) + int(parent2._units2D_2/2)
+        offspring2._unitsFull_2 = int(parent1._unitsFull_2) + int(parent2._unitsFull_2/2)
 
         # rearrange kernel and strides
-        offspring1._kernel = parent1._kernel
-        offspring1._stride = parent2._stride
-        offspring2._kernel = parent2._kernel
-        offspring2._stride = parent1._stride
+        offspring1._kernel_1, offspring1._kernel_2 = parent1._kernel_1, parent2._kernel_2
+        offspring1._stride_1, offspring2._stride_2 = parent1._stride_1, parent2._stride_2
+        offspring2._kernel_1, offspring2._kernel_2 = parent1._kernel_2, parent2._kernel_1
+        offspring2._stride_1, offspring2._stride_2 = parent1._stride_2, parent2._stride_1
 
         # rearrange dropout
-        offspring1._dropout2D = parent1._dropout2D
-        offspring1._dropoutFull = parent2._dropoutFull
-        offspring2._dropout2D = parent2._dropout2D
-        offspring2._dropoutFull = parent1._dropoutFull
+        offspring1._dropout2D_1, offspring1._dropout2D_2  = parent1._dropout2D_1, parent2._dropout2D_2
+        offspring1._dropoutFull_1, offspring1._dropoutFull_2  = parent1._dropoutFull_1, parent2._dropoutFull_2
+        offspring2._dropout2D_1, offspring2._dropout2D_2 = parent1._dropout2D_2, parent2._dropout2D_1
+        offspring2._dropoutFull_1, offspring2._dropoutFull_2 = parent1._dropoutFull_2, parent2._dropoutFull_1
 
         offsprings.append(offspring1)
         offsprings.append(offspring2)
@@ -160,15 +169,13 @@ def rearrange_networks(networks):
 def mutate_network(networks):
     for network in networks:
         if np.random.uniform(0, 1) <= 0.1:
-            network._units2D += np.random.randint(0,16)
+            network._units2D_1 += np.random.randint(0,32)
         if np.random.uniform(0, 1) <= 0.1:
-            network._unitsFull += np.random.randint(0,16)
+            network._unitsFull_1 += np.random.randint(0,32)
         if np.random.uniform(0, 1) <= 0.1:
-            network._kernel += np.random.randint(-1,1)
+            network._dropout2D_1 += np.random.uniform(-0.2,0.2)
         if np.random.uniform(0, 1) <= 0.1:
-            network._dropout2D += np.random.uniform(-0.2,0.2)
-        if np.random.uniform(0, 1) <= 0.1:
-            network._dropoutFull += np.random.uniform(-0.2,0.2)
+            network._dropoutFull_1 += np.random.uniform(-0.2,0.2)
 
     return networks
 
@@ -176,23 +183,43 @@ def mutate_network(networks):
 
 def optimizer():
     networks = init_networks(population)
-
+    networks_accuracy = []
+    best_network_accuracy = 0
     for generation in range(generations):
         print(f'Generation number {generation}')
-
+        total_accuracy = 0
         networks = assess_networks(networks)
+        for network in networks:
+          total_accuracy += network._accuracy
+
         networks = select_best_networks(networks)
         networks = rearrange_networks(networks)
         networks = mutate_network(networks)
 
+        average_accuracy = total_accuracy/len(networks)
+        networks_accuracy.append(average_accuracy)
+
         for network in networks:
-            if network._accuracy > threshold:
-                print ('Threshold met')
-                print (network.__dict__.items())
-                print ('Best accuracy: {}'.format(network._accuracy))
-                exit(0)
+          if network._accuracy > best_network_accuracy:
+              best_network_accuracy = network._accuracy
+              print('current best accuracy: ' +str(best_network_accuracy))
+
+          if network._accuracy > threshold:
+              print ('Threshold met')
+              print (network.__dict__.items())
+              print ('Best accuracy: {}'.format(network._accuracy))
+              logging.info(network.__dict__.items())
+              exit(0)
+        # Print out the average accuracy each generation.
+        logging.info("Generation average: %.2f%%" % (average_accuracy * 100))
+        logging.info('-'*80)
+        logging.info("***Doing generation %d of %d***" %
+          (generation + 1, generations))
+
+
+    return networks, networks_accuracy
     logging.info("***Evolving %d generations with population %d***" %
                  (generations, population))
 
 if __name__ == '__main__':
-    optimizer()
+  networks, networks_accuracy = optimizer()
