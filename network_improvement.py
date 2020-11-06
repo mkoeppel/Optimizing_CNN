@@ -1,4 +1,3 @@
-
 import logging
 import random
 import numpy as np
@@ -14,17 +13,17 @@ logging.basicConfig(
     level=logging.DEBUG,
     filename='log.txt'
 )
-
-### some general parameters on which to optimize the network-training
 dataset = cifar10
 no_classes = 10
 batch_size = 300
-validation_split = 0.
-epochs = 10
+validation_split = 0.2
+epochs = 4
 threshold = 0.9
-population = 20
-generations = 50
+population = 8
+generations = 2
 input_shape = (32, 32, 3)
+
+padding = ZeroPadding2D()
 
 
 def prepare_data(dataset):
@@ -49,63 +48,86 @@ class Network():
         """
         parameters to be optimized:
         """
-        self._units2D_1 = random.choice([16, 32, 64, 128])
+        self._units2D_1 = random.choice([16,32,64,128])
         self._dropout2D_1 = random.uniform(0.0, 0.3)
         self._kernel_1 = random.randint(3,5)
         self._stride_1 = random.randint(1,3)
         self._padding_1 =random.choice(['same', 'valid'])
-        self._units2D_2 = random.choice([16, 32, 64, 128])
-        self._dropout2D_2 = random.uniform(0.0, 0.3)
+        self._units2D_2 = random.choice([16,32,64,128])
+        self._dropout2D_2 = random.uniform(0.2, 0.5)
         self._kernel_2 = random.randint(3,5)
         self._stride_2 = random.randint(1,3)
         self._padding_2 =random.choice(['same', 'valid'])
 
-        self._unitsFull_1 = random.choice([32, 64, 128])
+        self._unitsFull_1 = random.choice([32,64,128,256])
         self._dropoutFull_1 = random.uniform(0.2, 0.5)
-        self._unitsFull_2 = random.choice([32, 64, 128])
+        self._unitsFull_2 = random.choice([32,64,128,256])
         self._dropoutFull_2 = random.uniform(0.2, 0.5)
 
 
         """
         fixed parameters:
         """
+        self._accuracy = 0
         self._loss = 'categorical_crossentropy'
         self._hidden_activation = 'relu'
         self._output_activation = 'softmax'
         self._optimizer = 'adam'
 
-        self._accuracy = 0
+    def get_parameters(self):
+      parameters = {
+          'units' : [self._units2D_1, self._units2D_2, self._unitsFull_1, self._unitsFull_2],
+          'dropouts' : [self._dropout2D_1, self._dropout2D_2 ,self._dropoutFull_1, self._dropoutFull_2],
+          'kernel' : [self._kernel_1, self._kernel_2],
+          'stride' : [self._stride_1, self._stride_2],
+          'padding' : [self._padding_1, self._padding_2],
+          'loss' : self._loss,
+          'hidden_activation' : self._hidden_activation,
+          'output_activation' : self._output_activation,
+          'optimizer' : self._optimizer
+      }
 
-    def create_model(self):
-        """
-        generates the actual models
+      return parameters
 
-        Params:
-            input: list of parametes given above
-            output: model containing a Pooling and a flattening layer + output for no_classes
-        """
-        kernel_1 = (self._kernel_1, self._kernel_1)
-        strides_1 = (self._stride_1, self._stride_1)
-        kernel_2 = (self._kernel_2, self._kernel_2)
-        strides_2 = (self._stride_2, self._stride_2)
 
-        model = Sequential()
-        model.add(InputLayer(input_shape = input_shape))
-        model.add(Conv2D(self._units2D_1, kernel_size= kernel_1, strides = strides_1, activation = self._hidden_activation))
-        model.add(Dropout(self._dropout2D_1))
-        model.add(Conv2D(self._units2D_2, kernel_size=kernel_2,strides = strides_1, activation = self._hidden_activation))
-        model.add(Dropout(self._dropout2D_2))
-        model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
-        model.add(Flatten())
-        model.add(Dense(self._unitsFull_1, activation = self._hidden_activation))
-        model.add(Dropout(self._dropoutFull_1))
-        model.add(Dense(self._unitsFull_2, activation = self._hidden_activation))
-        model.add(Dropout(self._dropoutFull_2))
-        model.add(Dense(no_classes, activation = self._output_activation))
-        model.compile(loss = self._loss, optimizer = self._optimizer, metrics = ['accuracy'])
-        model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=1)
 
-        return model
+def create_model(network):
+  """
+  generates the actual model
+
+  Params:
+      input: dictionary of parametes
+      output: model containing a Pooling and a flattening layer + output for no_classes
+  """
+  #for network in networks:
+  parameters = network.get_parameters()
+  units = parameters['units']
+  dropouts = parameters['dropouts']
+  kernel = parameters['kernel']
+  stride = parameters['stride']
+  padding = parameters['padding']
+  loss = parameters['loss']
+  hidden_activation = parameters['hidden_activation']
+  output_activation = parameters['output_activation']
+  optimizer = parameters['optimizer']
+
+  model = Sequential()
+  model.add(InputLayer(input_shape = input_shape))
+  model.add(Conv2D(units[0], kernel_size= kernel[0], padding = padding[0], strides = stride[0], activation = hidden_activation))
+  model.add(Dropout(dropouts[0]))
+  model.add(Conv2D(units[1], kernel_size=kernel[1], padding = padding[1], strides = stride[1], activation = hidden_activation))
+  model.add(Dropout(dropouts[1]))
+  model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
+  model.add(Flatten())
+  model.add(Dense(units[2], activation = hidden_activation))
+  model.add(Dropout(dropouts[2]))
+  model.add(Dense(units[3], activation = hidden_activation))
+  model.add(Dropout(dropouts[3]))
+  model.add(Dense(no_classes, activation = output_activation))
+  model.compile(loss = loss, optimizer = optimizer, metrics = ['accuracy'])
+  model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
+
+  return model
 
 def init_networks(population):
     return [Network() for _ in range(population)]
@@ -114,7 +136,7 @@ def assess_networks(networks):
     for network in networks:
         try:
             model = create_model(network)
-            accuracy = model.evaluate(test_images, test_labels, verbose=0)[1]
+            accuracy = model.evaluate(test_images, test_labels)[1]
             network._accuracy = accuracy
             print('Accuracy: {}'.format(network._accuracy))
 
@@ -169,9 +191,9 @@ def rearrange_networks(networks):
 def mutate_network(networks):
     for network in networks:
         if np.random.uniform(0, 1) <= 0.1:
-            network._units2D_1 += np.random.randint(0,32)
+            network._units2D_1 += np.random.randint(1,4)*16
         if np.random.uniform(0, 1) <= 0.1:
-            network._unitsFull_1 += np.random.randint(0,32)
+            network._unitsFull_1 += np.random.randint(1,4)*16
         if np.random.uniform(0, 1) <= 0.1:
             network._dropout2D_1 += np.random.uniform(-0.2,0.2)
         if np.random.uniform(0, 1) <= 0.1:
@@ -185,6 +207,7 @@ def optimizer():
     networks = init_networks(population)
     networks_accuracy = []
     best_network_accuracy = 0
+    best_network = 0
     for generation in range(generations):
         print(f'Generation number {generation}')
         total_accuracy = 0
@@ -202,6 +225,7 @@ def optimizer():
         for network in networks:
           if network._accuracy > best_network_accuracy:
               best_network_accuracy = network._accuracy
+              best_network = network
               print('current best accuracy: ' +str(best_network_accuracy))
 
           if network._accuracy > threshold:
@@ -217,9 +241,9 @@ def optimizer():
           (generation + 1, generations))
 
 
-    return networks, networks_accuracy
+    return networks, networks_accuracy, best_network
     logging.info("***Evolving %d generations with population %d***" %
                  (generations, population))
 
 if __name__ == '__main__':
-  networks, networks_accuracy = optimizer()
+  networks, networks_accuracy, best_network = optimizer()
