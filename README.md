@@ -1,4 +1,4 @@
-# Optimizing_Neural-Nets
+# Optimizing_Neural_Nets
 Mimicking biologic evolutionary processes, this project adapts, recombines, and mutates hyperparameters from best-performing neural networks within a given population.
 
 It performs an initial random initialization of hyperparameters for a population of neural networks and tests their learning on the cifar10 dataset.
