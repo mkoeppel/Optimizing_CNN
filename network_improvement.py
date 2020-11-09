@@ -69,6 +69,7 @@ class Network():
         self._layersDense = [self._layerDense_1, self._layerDense_2]
 
         for layer in self._layers2D:
+<<<<<<< HEAD
             units = random.choice([16, 32, 64, 128])
             kernel = random.randint(3, 5)
             stride = random.randint(1, 3)
@@ -83,6 +84,22 @@ class Network():
 
         self._optimizer = random.choice(['rmsprop', 'adam', 'sgd', 'adagrad'])
         self._epochs = random.randint(10, 15)
+=======
+            units = random.choice([16,32,64,128])
+            kernel = random.randint(3,5)
+            stride = random.randint(1,3)
+            paddding_type = random.choice(['same', 'valid'])
+            dropout = random.randint(1,3)*0.1
+            layer.extend([units, kernel, stride, paddding_type, dropout])
+
+        for layer in self._layersDense:
+            units = random.choice([32,64,128])
+            dropout = random.randint(2,5)*0.1
+            layer.extend([units, dropout])
+
+        self._optimizer = random.choice(['rmsprop', 'adam', 'sgd', 'adagrad'])
+        self._epochs = random.randint(10,15)
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
         """
         fixed parameters:
         """
@@ -92,6 +109,7 @@ class Network():
         self._genetic_function = 0
 
     def get_parameters(self):
+<<<<<<< HEAD
         """
         provides a dictionary of prarameters for each instantce of Network
         """
@@ -107,6 +125,22 @@ class Network():
         'epochs' : self._epochs,
         }
     return parameters
+=======
+        parameters = {
+
+          'layer2D_1' : self._layer2D_1,
+          'layer2D_2' : self._layer2D_2,
+          'layerDense_1' : self._layerDense_1,
+          'layerDense_2' : self._layerDense_2,
+          'loss' : self._loss,
+          'hidden_activation' : self._hidden_activation,
+          'output_activation' : self._output_activation,
+          'optimizer' : self._optimizer,
+          'epochs' : self._epochs,
+          }
+        return parameters
+
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
 
 
 def create_model(network):
@@ -131,6 +165,7 @@ def create_model(network):
     optimizer = parameters['optimizer']
 
     model = Sequential()
+<<<<<<< HEAD
     model.add(InputLayer(input_shape=input_shape))
     model.add(Conv2D(layer2D_1[0], kernel_size=layer2D_1[1], strides=layer2D_1[2], padding=layer2D_1[3], activation=hidden_activation))
     model.add(Dropout(layer2D_1[4]))
@@ -144,6 +179,21 @@ def create_model(network):
     model.add(Dropout(layerDense_2[1]))
     model.add(Dense(no_classes, activation=output_activation))
     model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
+=======
+    model.add(InputLayer(input_shape = input_shape))
+    model.add(Conv2D(layer2D_1[0], kernel_size= layer2D_1[1], strides = layer2D_1[2], padding = layer2D_1[3], activation = hidden_activation))
+    model.add(Dropout(layer2D_1[4]))
+    model.add(Conv2D(layer2D_2[0], kernel_size= layer2D_2[1], strides = layer2D_2[2], padding = layer2D_2[3], activation = hidden_activation))
+    model.add(Dropout(layer2D_2[4]))
+    model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
+    model.add(Flatten())
+    model.add(Dense(layerDense_1[0], activation = hidden_activation))
+    model.add(Dropout(layerDense_1[1]))
+    model.add(Dense(layerDense_2[0], activation = hidden_activation))
+    model.add(Dropout(layerDense_2[1]))
+    model.add(Dense(no_classes, activation = output_activation))
+    model.compile(loss = loss, optimizer = optimizer, metrics = ['accuracy'])
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
     model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
 
     return model
@@ -196,7 +246,11 @@ def rearrange_networks(networks):
         offspring2 = Network()
 
         # select mutator type
+<<<<<<< HEAD
         genetic_function = random.randint(1, 2)
+=======
+        genetic_function = random.randint(1,2)
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
         if genetic_function == 1:
             offspring1._genetic_function == 1
             offspring2._genetic_function == 1
@@ -226,6 +280,7 @@ def rearrange_networks(networks):
 
             for layer in offspring1._layersDense:
                 layer[0] = random.choice([parent1.layerDense_1[0], parent1.layerDense_2[0], parent1.layerDense_3[0], parent1.layerDense_4[0],
+<<<<<<< HEAD
                                         parent2.layerDense_1[0], parent2.layerDense_2[0], parent2.layerDense_3[0], parent2.layerDense_4[0]])
                 layer[1] = random.choice([parent1.layerDense_1[1], parent1.layerDense_2[1], parent1.layerDense_3[1], parent1.layerDense_4[1],
                                         parent2.layerDense_1[1], parent2.layerDense_2[1], parent2.layerDense_3[1], parent2.layerDense_4[1]])
@@ -238,6 +293,20 @@ def rearrange_networks(networks):
                                         parent2.layerDense_1[1], parent2.layerDense_2[1], parent2.layerDense_3[1], parent2.layerDense_4[1]])
                 layer[2] = random.choice([parent1.layerDense_1[2], parent1.layerDense_2[2], parent1.layerDense_3[2], parent1.layerDense_4[2],
                                         parent2.layerDense_1[2], parent2.layerDense_2[2], parent2.layerDense_3[2], parent2.layerDense_4[2]])
+=======
+                parent2.layerDense_1[0], parent2.layerDense_2[0], parent2.layerDense_3[0], parent2.layerDense_4[0]])
+                layer[1] = random.choice([parent1.layerDense_1[1], parent1.layerDense_2[1], parent1.layerDense_3[1], parent1.layerDense_4[1],
+                parent2.layerDense_1[1], parent2.layerDense_2[1], parent2.layerDense_3[1], parent2.layerDense_4[1]])
+                layer[2] = random.choice([parent1.layerDense_1[2], parent1.layerDense_2[2], parent1.layerDense_3[2], parent1.layerDense_4[2],
+                parent2.layerDense_1[2], parent2.layerDense_2[2], parent2.layerDense_3[2], parent2.layerDense_4[2]])
+            for layer in offspring2._layersDense:
+                layer[0] = random.choice([parent1.layerDense_1[0], parent1.layerDense_2[0], parent1.layerDense_3[0], parent1.layerDense_4[0],
+                parent2.layerDense_1[0], parent2.layerDense_2[0], parent2.layerDense_3[0], parent2.layerDense_4[0]])
+                layer[1] = random.choice([parent1.layerDense_1[1], parent1.layerDense_2[1], parent1.layerDense_3[1], parent1.layerDense_4[1],
+                parent2.layerDense_1[1], parent2.layerDense_2[1], parent2.layerDense_3[1], parent2.layerDense_4[1]])
+                layer[2] = random.choice([parent1.layerDense_1[2], parent1.layerDense_2[2], parent1.layerDense_3[2], parent1.layerDense_4[2],
+                parent2.layerDense_1[2], parent2.layerDense_2[2], parent2.layerDense_3[2], parent2.layerDense_4[2]])
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
 
 
         offsprings.append(offspring1)
@@ -245,6 +314,8 @@ def rearrange_networks(networks):
 
     networks.extend(offsprings)
     return networks
+
+
 
 def mutate_network(networks):
     """
@@ -254,6 +325,7 @@ def mutate_network(networks):
         for layer in network._layers2D:
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate units
+<<<<<<< HEAD
                 layer[0] += np.random.randint(-2, 4)*16
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate dropout
@@ -274,8 +346,32 @@ def mutate_network(networks):
 
         if np.random.uniform(0, 1) <= 0.1:
             network._epochs += random.randint(-2, 4)
+=======
+                layer[0] += np.random.randint(-2,4)*16
+            if np.random.uniform(0, 1) <= 0.1:
+                # mutate dropout
+                layer[4] += np.random.randint(-2,2)*0.1
+            if np.random.uniform(0, 1) <= 0.1:
+                # mutate kernel_size
+                layer[1] += np.random.randint(-1,1)
+            if np.random.uniform(0, 1) <= 0.1:
+                # mutate stride_size
+                layer[2] += np.random.randint(-1,1)
+        for layer in network._layersDense:
+            if np.random.uniform(0, 1) <= 0.1:
+                # mutate units
+                layer[0] += np.random.randint(-2,4)*16
+            if np.random.uniform(0, 1) <= 0.1:
+                # mutate dropout
+                layer[1] += np.random.randint(-2,2)*0.1
+
+        if np.random.uniform(0, 1) <= 0.1:
+            network._epochs += random.randint(-2,4)
+>>>>>>> 4543178f96c07171e233fd28d460c8a14f716a98
 
     return networks
+
+
 
 (train_images, train_labels), (test_images, test_labels) = prepare_data(dataset)
 
