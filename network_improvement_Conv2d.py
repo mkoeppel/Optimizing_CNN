@@ -10,11 +10,6 @@ from keras.layers import InputLayer, Dense, Activation, Dropout, Conv2D, MaxPool
 from keras.datasets import cifar10
 from keras.utils import to_categorical
 
-# two different function for rearranging parental layers and parameters for inclusion in offsprings:
-# layer_inheritance(networks): complete layers are combined, so one from each parent into each offspring
-# parameter_crossover(networks): randomly chosing of parental parameters to be include din the offsprings
-
-
 
 # Setup logging.
 logging.basicConfig(
@@ -60,8 +55,8 @@ class Network():
     def __init__(self):
         """
         parameters to be optimized:
-            2d-layers: units, kernel, stride, padding, dropout
-            Dense-layers: units, dropout
+            2d-layers: units, kernel, stride, padding, dropout, hidden_activation
+            optimizer, epochs
         """
         self._layer2D_1 = []
         self._layer2D_2 = []
@@ -69,17 +64,17 @@ class Network():
         self._layers2D = [self._layer2D_1, self._layer2D_2]
 
         for layer in self._layers2D:
-            units = random.choice([16,32,64,128])
-            kernel = random.randint(3,5)
-            stride = random.randint(1,3)
+            units = random.choice([16, 32, 64, 128])
+            kernel = random.randint(3, 5)
+            stride = random.randint(1, 3)
             paddding_type = random.choice(['same', 'valid'])
-            dropout = random.randint(1,3)*0.1
+            dropout = random.randint(1, 3)*0.1
             hidden_activation = random.choice(['relu', 'tanh', 'swish'])
             layer.extend([units, kernel, stride, paddding_type, dropout, hidden_activation])
 
 
         self._optimizer = random.choice(['rmsprop', 'adam', 'sgd', 'adagrad'])
-        self._epochs = random.randint(10,15)
+        self._epochs = random.randint(10, 15)
         """
         fixed parameters:
         """
@@ -99,7 +94,7 @@ class Network():
           'loss' : self._loss,
           'output_activation' : self._output_activation,
           'optimizer' : self._optimizer,
-          'epochs' : self._epochs,
+          'epochs' : self._epochs
           }
         return parameters
 
@@ -118,11 +113,10 @@ def create_model(network):
 
     layer2D_1 = parameters['layer2D_1']
     layer2D_2 = parameters['layer2D_2']
-
-
     loss = parameters['loss']
     output_activation = parameters['output_activation']
     optimizer = parameters['optimizer']
+    epochs = parameter['epochs']
 
     model = Sequential()
     model.add(InputLayer(input_shape=input_shape))
@@ -137,7 +131,6 @@ def create_model(network):
     model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
 
     return model
-
 
 
 def init_networks(population):
@@ -188,15 +181,15 @@ def rearrange_networks(networks):
         # select mutator type
         genetic_function = random.randint(1, 2)
         if genetic_function == 1:
-            offspring1._genetic_function == 1
-            offspring2._genetic_function == 1
+            offspring1._genetic_function = 1
+            offspring2._genetic_function = 1
             # rearrage layers
             offspring1._layer2D_1, offspring1._layer2D_2 = parent1._layer2D_1, parent2._layer2D_2
             offspring2._layer2D_1, offspring2._layer2D_2 = parent2._layer2D_1, parent1._layer2D_2
 
         else:
-            offspring1._genetic_function == 2
-            offspring2._genetic_function == 2
+            offspring1._genetic_function = 2
+            offspring2._genetic_function = 2
             #exchange parameters from the first with those of the second layer, that is: units, kernel, stride, padding, dropout, hidden_activation
             for layer in offspring1._layers2D:
                 layer[0] = random.choice([parent1._layer2D_1[0], parent1._layer2D_2[0], parent2._layer2D_1[0], parent2._layer2D_2[0]])

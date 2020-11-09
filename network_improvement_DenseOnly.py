@@ -3,7 +3,7 @@ import random
 import numpy as np
 from keras.models import Sequential
 from keras.layers import InputLayer, Dense, Activation, Dropout, Flatten
-from keras.datasets import cifar10, mnist
+from keras.datasets import cifar10
 from keras.utils import to_categorical
 
 # Setup logging.
@@ -82,7 +82,7 @@ class Network():
           'loss' : self._loss,
           'output_activation' : self._output_activation,
           'optimizer' : self._optimizer,
-          'epochs' : self._epochs,
+          'epochs' : self._epochs
           }
         return parameters
 
@@ -101,7 +101,6 @@ def create_model(network):
     layerDense_1 = parameters['layerDense_1']
     layerDense_2 = parameters['layerDense_2']
     layerDense_3 = parameters['layerDense_3']
-
     loss = parameters['loss']
     output_activation = parameters['output_activation']
     optimizer = parameters['optimizer']
@@ -121,7 +120,6 @@ def create_model(network):
     model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
 
     return model
-
 
 
 def init_networks(population):
