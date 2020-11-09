@@ -10,10 +10,6 @@ from keras.layers import InputLayer, Dense, Activation, Dropout, Conv2D, MaxPool
 from keras.datasets import cifar10
 from keras.utils import to_categorical
 
-# two different function for rearranging parental layers and parameters for inclusion in offsprings:
-# layer_inheritance(networks): complete layers are combined, so one from each parent into each offspring
-# parameter_crossover(networks): randomly chosing of parental parameters to be include din the offsprings
-
 
 
 # Setup logging.
@@ -291,6 +287,7 @@ def optimizer():
           if network._accuracy > best_network_accuracy:
               best_network_accuracy = network._accuracy
               best_network = network
+              logging.info(best_network.__dict__.items())
               print('current best accuracy: ' +str(best_network_accuracy))
 
           if network._accuracy > threshold:

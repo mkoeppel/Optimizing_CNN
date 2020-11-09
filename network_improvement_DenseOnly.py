@@ -243,6 +243,7 @@ def optimizer():
           if network._accuracy > best_network_accuracy:
               best_network_accuracy = network._accuracy
               best_network = network
+              logging.info(best_network.__dict__.items())
               print('current best accuracy: ' +str(best_network_accuracy))
 
           if network._accuracy > threshold:
