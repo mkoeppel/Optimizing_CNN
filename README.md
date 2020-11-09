@@ -7,6 +7,7 @@ Subsequently, it selects the 20% best performing networks and generates offsprin
 Two different ways are possible for rearranging parental layers and parameters for inclusion in offsprings:
 - inheritance of complete layers: layers from the both parental networks are combined, so one from each into each offspring (resembling the shuffling of whole chromosomes in biology)
 - crossover of parameters: parental parameters are randomly chosen and included in the offsprings (resembling homologues recombination during meiosis) \
+
 Afterwards (numeric) parameters have a 10% chance of being additionally rendered by a small value (resembling genetic point-mutations)
 
 This performance-testing and rearranging of hyperparameters is done for > 20 rounds (generations), to select those network-settings that outperform the others by means of validation-accuracy.
@@ -24,7 +25,7 @@ flexible hyperparameters are:
 
 parameters that are fixed (for now):
 - number of conv-layers: 2
-- number of dense layers: 2 (4 in network_improvement_DenseOnly.py)
+- number of dense layers: 2 (3 in network_improvement_DenseOnly.py)
 - output activation function: softmax
 - loss-function: categorical_crossentropy
 - batch_size: 300

@@ -89,6 +89,9 @@ class Network():
         self._genetic_function = 0
 
     def get_parameters(self):
+        """
+        provides a dictionary of prarameters for each instantce of Network
+        """
         parameters = {
 
           'layer2D_1' : self._layer2D_1,
@@ -122,15 +125,15 @@ def create_model(network):
     optimizer = parameters['optimizer']
 
     model = Sequential()
-    model.add(InputLayer(input_shape = input_shape))
-    model.add(Conv2D(layer2D_1[0], kernel_size= layer2D_1[1], strides = layer2D_1[2], padding = layer2D_1[3], activation = layer2D_1[5]))
+    model.add(InputLayer(input_shape=input_shape))
+    model.add(Conv2D(layer2D_1[0], kernel_size=layer2D_1[1], strides=layer2D_1[2], padding=layer2D_1[3], activation=layer2D_1[5]))
     model.add(Dropout(layer2D_1[4]))
-    model.add(Conv2D(layer2D_2[0], kernel_size= layer2D_2[1], strides = layer2D_2[2], padding = layer2D_2[3], activation = layer2D_1[5]))
-    model.add(Dropout(layer2D_2[4]))
-    model.add(MaxPooling2D(pool_size=(2,2), strides = (2,2)))
+    model.add(Conv2D(layer2D_2[0], kernel_size=layer2D_2[1], strides=layer2D_2[2], padding=layer2D_2[3], activation=layer2D_1[5]))
+    model.add(Dropout(layer2D_2[4])
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(no_classes, activation = output_activation))
-    model.compile(loss = loss, optimizer = optimizer, metrics = ['accuracy'])
+    model.add(Dense(no_classes, activation=output_activation))
+    model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
     model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
 
     return model
@@ -138,9 +141,16 @@ def create_model(network):
 
 
 def init_networks(population):
+    """
+    instantiate networks according to the number defined as population
+    """
     return [Network() for _ in range(population)]
 
 def assess_networks(networks):
+    """
+    attempts to build models from each network and
+    generates accuracies by evaluating them on the test-set
+    """
     for network in networks:
         try:
             model = create_model(network)
@@ -154,6 +164,9 @@ def assess_networks(networks):
     return networks
 
 def select_best_networks(networks):
+    """
+    sorts models by best performance and keeps only top 20%
+    """
     networks = sorted(networks, key=lambda network: network._accuracy, reverse=True)
     networks = networks[:int(0.2 * len(networks))]
 
@@ -161,6 +174,10 @@ def select_best_networks(networks):
 
 
 def rearrange_networks(networks):
+    """
+    combines the parameters of the best performing networks and
+    adds offsprings to the population
+    """
     offsprings = []
     for _ in range(int((population - len(networks)) / 2)):
         parent1 = random.choice(networks)
@@ -169,7 +186,7 @@ def rearrange_networks(networks):
         offspring2 = Network()
 
         # select mutator type
-        genetic_function = random.randint(1,2)
+        genetic_function = random.randint(1, 2)
         if genetic_function == 1:
             offspring1._genetic_function == 1
             offspring2._genetic_function == 1
@@ -205,20 +222,23 @@ def rearrange_networks(networks):
 
 
 def mutate_network(networks):
+    """
+    randomly renders individual parameters in 10% of all cases
+    """
     for network in networks:
         for layer in network._layers2D:
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate units
-                layer[0] += np.random.randint(-2,4)*16
+                layer[0] += np.random.randint(-2, 4)*16
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate dropout
                 layer[4] += np.random.randint(-2,2)*0.1
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate kernel_size
-                layer[1] += np.random.randint(-1,1)
+                layer[1] += np.random.randint(-1, 1)
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate stride_size
-                layer[2] += np.random.randint(-1,1)
+                layer[2] += np.random.randint(-1, 1)
         if np.random.uniform(0, 1) <= 0.1:
             network._epochs += random.randint(-2,4)
 
@@ -229,6 +249,10 @@ def mutate_network(networks):
 (train_images, train_labels), (test_images, test_labels) = prepare_data(dataset)
 
 def optimizer():
+    """
+    main function, pipelines the networks through the optimization process
+    logs best performing ones
+    """
     networks = init_networks(population)
     networks_accuracy = []
     best_network_accuracy = 0
@@ -261,7 +285,7 @@ def optimizer():
               logging.info(network.__dict__.items())
               exit(0)
         # Print out the average accuracy each generation.
-        logging.info("Generation average: %.2f%%" % (average_accuracy * 100))
+        logging.info("Generation average: %.2f%%" % (average_accuracy*100))
         logging.info('-'*80)
         logging.info("***Doing generation %d of %d***" %
           (generation + 1, generations))
