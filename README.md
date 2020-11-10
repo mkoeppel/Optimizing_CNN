@@ -31,7 +31,7 @@ parameters that are fixed (for now):
 - batch_size: 300
 
 
-##### an example result from optmizing only the conv2D-layers for 30 generations with a population size of 20:
+##### an example result from optimizing only the conv2D-layers for 30 generations with a population size of 20:
 ![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/Conv2D_opt_output.png)
 
 
