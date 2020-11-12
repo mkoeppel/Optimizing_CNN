@@ -32,7 +32,7 @@ parameters that are fixed (for now):
 
 
 ##### an example result from optimizing a neural net with 2 conv2D and 2 dense layers for 20 generations with a population size of 25:
-![alt text] (https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/NeuralNet_opt_output.png)
+![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/NeuralNet_opt_output.png)
 
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
