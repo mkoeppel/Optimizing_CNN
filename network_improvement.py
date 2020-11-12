@@ -26,12 +26,10 @@ dataset = cifar10
 no_classes = 10
 batch_size = 300
 validation_split = 0.2
-epochs = 4
-threshold = 0.9
-population = 2
-generations = 2
+threshold = 0.8
+population = 25
+generations = 20
 input_shape = (32, 32, 3)
-
 
 
 class Network():
@@ -42,15 +40,15 @@ class Network():
             Dense-layers: units, dropout, hidden_activation
             optimizer, epochs
         """
-        self._layer2D_1 = []
-        self._layer2D_2 = []
-        self._layerDense_1 = []
-        self._layerDense_2 = []
+        self._layer_2D_1 = []
+        self._layer_2D_2 = []
+        self._layer_dense_1 = []
+        self._layer_dense_2 = []
 
-        self._layers2D = [self._layer2D_1, self._layer2D_2]
-        self._layersDense = [self._layerDense_1, self._layerDense_2]
+        self._layers_2D = [self._layer_2D_1, self._layer_2D_2]
+        self._layers_dense = [self._layer_dense_1, self._layer_dense_2]
 
-        for layer in self._layers2D:
+        for layer in self._layers_2D:
             units = random.choice([16, 32, 64, 128])
             kernel = random.randint(3, 5)
             stride = random.randint(1, 3)
@@ -59,8 +57,8 @@ class Network():
             hidden_activation = random.choice(['relu', 'tanh', 'swish'])
             layer.extend([units, kernel, stride, paddding_type, dropout, hidden_activation])
 
-        for layer in self._layersDense:
-            units = random.choice([32, 64, 128])
+        for layer in self._layers_dense:
+            units = random.choice([16, 32, 64, 128])
             dropout = random.randint(2, 5)*0.1
             hidden_activation = random.choice(['relu', 'tanh', 'swish'])
             layer.extend([units, dropout, hidden_activation])
@@ -81,14 +79,14 @@ class Network():
         provides a dictionary of prarameters for each instantce of Network
         """
         parameters = {
-        'layer2D_1' : self._layer2D_1,
-        'layer2D_2' : self._layer2D_2,
-        'layerDense_1' : self._layerDense_1,
-        'layerDense_2' : self._layerDense_2,
-        'loss' : self._loss,
-        'output_activation' : self._output_activation,
-        'optimizer' : self._optimizer,
-        'epochs' : self._epochs
+            'layer_2D_1' : self._layer_2D_1,
+            'layer_2D_2' : self._layer_2D_2,
+            'layer_dense_1' : self._layer_dense_1,
+            'layer_dense_2' : self._layer_dense_2,
+            'loss' : self._loss,
+            'output_activation' : self._output_activation,
+            'optimizer' : self._optimizer,
+            'epochs' : self._epochs
         }
         return parameters
 
@@ -105,10 +103,10 @@ def create_model(network):
 
     parameters = network.get_parameters()
 
-    layer2D_1 = parameters['layer2D_1']
-    layer2D_2 = parameters['layer2D_2']
-    layerDense_1 = parameters['layerDense_1']
-    layerDense_2 = parameters['layerDense_2']
+    layer_2D_1 = parameters['layer_2D_1']
+    layer_2D_2 = parameters['layer_2D_2']
+    layer_dense_1 = parameters['layer_dense_1']
+    layer_dense_2 = parameters['layer_dense_2']
 
     loss = parameters['loss']
     output_activation = parameters['output_activation']
@@ -117,16 +115,18 @@ def create_model(network):
 
     model = Sequential()
     model.add(InputLayer(input_shape=input_shape))
-    model.add(Conv2D(layer2D_1[0], kernel_size=layer2D_1[1], strides=layer2D_1[2], padding=layer2D_1[3], activation=layer2D_1[5]))
-    model.add(Dropout(layer2D_1[4]))
-    model.add(Conv2D(layer2D_2[0], kernel_size=layer2D_2[1], strides=layer2D_2[2], padding=layer2D_2[3], activation=layer2D_1[5]))
-    model.add(Dropout(layer2D_2[4]))
+    model.add(Conv2D(layer_2D_1[0], kernel_size=layer_2D_1[1], strides=layer_2D_1[2],
+                     padding=layer_2D_1[3], activation=layer_2D_1[5]))
+    model.add(Dropout(layer_2D_1[4]))
+    model.add(Conv2D(layer_2D_2[0], kernel_size=layer_2D_2[1], strides=layer_2D_2[2],
+                     padding=layer_2D_2[3], activation=layer_2D_1[5]))
+    model.add(Dropout(layer_2D_2[4]))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(layerDense_1[0], activation=layerDense_1[2]))
-    model.add(Dropout(layerDense_1[1]))
-    model.add(Dense(layerDense_2[0], activation=layerDense_1[2]))
-    model.add(Dropout(layerDense_2[1]))
+    model.add(Dense(layer_dense_1[0], activation=layer_dense_1[2]))
+    model.add(Dropout(layer_dense_1[1]))
+    model.add(Dense(layer_dense_2[0], activation=layer_dense_1[2]))
+    model.add(Dropout(layer_dense_2[1]))
     model.add(Dense(no_classes, activation=output_activation))
     model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
     model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, verbose=0)
@@ -157,44 +157,41 @@ def rearrange_networks(networks):
         genetic_function = random.randint(1, 2)
 
         if genetic_function == 1:
-            offspring1._genetic_function == 1
-            offspring2._genetic_function == 1
+            offspring1._genetic_function = 1
+            offspring2._genetic_function = 1
             # rearrage layers
-            offspring1._layer2D_1, offspring1._layer2D_2 = parent1._layer2D_1, parent2._layer2D_2
-            offspring2._layer2D_1, offspring2._layer2D_2 = parent2._layer2D_1, parent1._layer2D_2
-            offspring1._layerDense_1, offspring1._layerDense_2 = parent1._layerDense_1, parent2._layerDense_2
-            offspring2._layerDense_1, offspring2._layerDense_2 = parent2._layerDense_1, parent1._layerDense_2
+            offspring1._layer_2D_1, offspring1._layer_2D_2 = parent1._layer_2D_1, parent2._layer_2D_2
+            offspring2._layer_2D_1, offspring2._layer_2D_2 = parent2._layer_2D_1, parent1._layer_2D_2
+            offspring1._layer_dense_1, offspring1._layer_dense_2 = parent1._layer_dense_1, parent2._layer_dense_2
+            offspring2._layer_dense_1, offspring2._layer_dense_2 = parent2._layer_dense_1, parent1._layer_dense_2
+            # rearrage epochs and optimizer
+            offspring1._epochs, offspring2._epochs = parent1._epochs, parent2._epochs
+            offspring1._optimizer, offspring2._optimizer = parent2._optimizer, parent1._optimizer
 
         else:
-            offspring1._genetic_function == 2
-            offspring2._genetic_function == 2
-            #exchange parameters from the first with those of the second layer and those from the third with the forth
-            for layer in offspring1._layers2D:
-                layer[0] = random.choice([parent1._layer2D_1[0], parent1._layer2D_2[0], parent2._layer2D_1[0], parent2._layer2D_2[0]])
-                layer[1] = random.choice([parent1._layer2D_1[1], parent1._layer2D_2[1], parent2._layer2D_1[1], parent2._layer2D_2[1]])
-                layer[2] = random.choice([parent1._layer2D_1[2], parent1._layer2D_2[2], parent2._layer2D_1[2], parent2._layer2D_2[2]])
-                layer[4] = random.choice([parent1._layer2D_1[4], parent1._layer2D_2[4], parent2._layer2D_1[4], parent2._layer2D_2[4]])
+            offspring1._genetic_function = 2
+            offspring2._genetic_function = 2
+            # randomly exchange parameters from parental layers
+            for layer in offspring1._layers_2D:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
 
-            for layer in offspring2._layers2D:
-                layer[0] = random.choice([parent1._layer2D_1[0], parent1._layer2D_2[0], parent2._layer2D_1[0], parent2._layer2D_2[0]])
-                layer[1] = random.choice([parent1._layer2D_1[1], parent1._layer2D_2[1], parent2._layer2D_1[1], parent2._layer2D_2[1]])
-                layer[2] = random.choice([parent1._layer2D_1[2], parent1._layer2D_2[2], parent2._layer2D_1[2], parent2._layer2D_2[2]])
-                layer[4] = random.choice([parent1._layer2D_1[4], parent1._layer2D_2[4], parent2._layer2D_1[4], parent2._layer2D_2[4]])
+            for layer in offspring2._layers_2D:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
 
-            for layer in offspring1._layersDense:
-                layer[0] = random.choice([parent1._layerDense_1[0], parent1._layerDense_2[0],
-                                        parent2._layerDense_1[0], parent2._layerDense_2[0]])
-                layer[1] = random.choice([parent1._layerDense_1[1], parent1._layerDense_2[1],
-                                        parent2._layerDense_1[1], parent2._layerDense_2[1]])
-                layer[2] = random.choice([parent1._layerDense_1[2], parent1._layerDense_2[2],
-                                        parent2._layerDense_1[2], parent2._layerDense_2[2]])
-            for layer in offspring2._layersDense:
-                layer[0] = random.choice([parent1._layerDense_1[0], parent1._layerDense_2[0],
-                                        parent2._layerDense_1[0], parent2._layerDense_2[0]])
-                layer[1] = random.choice([parent1._layerDense_1[1], parent1._layerDense_2[1],
-                                        parent2._layerDense_1[1], parent2._layerDense_2[1]])
-                layer[2] = random.choice([parent1._layerDense_1[2], parent1._layerDense_2[2],
-                                        parent2._layerDense_1[2], parent2._layerDense_2[2]])
+            for layer in offspring1._layers_dense:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_dense_1[i], parent1._layer_dense_2[i],
+                                              parent2._layer_dense_1[i], parent2._layer_dense_2[i]])
+
+            for layer in offspring2._layers_dense:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_dense_1[i], parent1._layer_dense_2[i],
+                                              parent2._layer_dense_1[i], parent2._layer_dense_2[i]])
+            # rearrage epochs and optimizer
+            offspring1._epochs, offspring2._epochs = parent1._epochs, parent2._epochs
+            offspring1._optimizer, offspring2._optimizer = parent2._optimizer, parent1._optimizer
 
         offsprings.append(offspring1)
         offsprings.append(offspring2)
@@ -208,7 +205,7 @@ def mutate_network(networks):
     randomly renders individual parameters in 10% of all cases
     """
     for network in networks:
-        for layer in network._layers2D:
+        for layer in network._layers_2D:
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate units
                 layer[0] += np.random.randint(-2, 4)*16
@@ -221,7 +218,7 @@ def mutate_network(networks):
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate stride_size
                 layer[2] += np.random.randint(-1, 1)
-        for layer in network._layersDense:
+        for layer in network._layers_dense:
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate units
                 layer[0] += np.random.randint(-2, 4)*16
@@ -252,7 +249,7 @@ def optimizer():
         total_accuracy = 0
         networks = assess_networks(networks)
         for network in networks:
-          total_accuracy += network._accuracy
+            total_accuracy += network._accuracy
 
         networks = select_best_networks(networks)
         networks = rearrange_networks(networks)
@@ -262,23 +259,23 @@ def optimizer():
         networks_accuracy.append(average_accuracy)
 
         for network in networks:
-          if network._accuracy > best_network_accuracy:
-              best_network_accuracy = network._accuracy
-              best_network = network
-              logging.info(best_network.__dict__.items())
-              print('current best accuracy: ' +str(best_network_accuracy))
+            if network._accuracy > best_network_accuracy:
+                best_network_accuracy = network._accuracy
+                best_network = network
+                logging.info(best_network.__dict__.items())
+                print('current best accuracy: ' +str(best_network_accuracy))
 
-          if network._accuracy > threshold:
-              print ('Threshold met')
-              print (network.__dict__.items())
-              print ('Best accuracy: {}'.format(network._accuracy))
-              logging.info(network.__dict__.items())
-              exit(0)
+            if network._accuracy > threshold:
+                print('Threshold met')
+                print(network.__dict__.items())
+                print('Best accuracy: {}'.format(network._accuracy))
+                logging.info(network.__dict__.items())
+                exit(0)
         # Print out the average accuracy each generation.
         logging.info("Generation average: %.2f%%" % (average_accuracy*100))
         logging.info('-'*80)
         logging.info("***Doing generation %d of %d***" %
-          (generation + 1, generations))
+                     (generation + 1, generations))
 
 
     return networks, networks_accuracy, best_network
@@ -286,4 +283,4 @@ def optimizer():
                  (generations, population))
 
 if __name__ == '__main__':
-  networks, networks_accuracy, best_network = optimizer()
+    networks, networks_accuracy, best_network = optimizer()

@@ -25,13 +25,10 @@ dataset = cifar10
 no_classes = 10
 batch_size = 300
 validation_split = 0.2
-epochs = 10
 threshold = 0.9
 population = 20
 generations = 20
 input_shape = (32, 32, 3)
-
-padding = ZeroPadding2D()
 
 
 class Network():
@@ -41,12 +38,12 @@ class Network():
             2d-layers: units, kernel, stride, padding, dropout, hidden_activation
             optimizer, epochs
         """
-        self._layer2D_1 = []
-        self._layer2D_2 = []
+        self._layer_2D_1 = []
+        self._layer_2D_2 = []
 
-        self._layers2D = [self._layer2D_1, self._layer2D_2]
+        self._layers_2D = [self._layer_2D_1, self._layer_2D_2]
 
-        for layer in self._layers2D:
+        for layer in self._layers_2D:
             units = random.choice([16, 32, 64, 128])
             kernel = random.randint(3, 5)
             stride = random.randint(1, 3)
@@ -72,8 +69,8 @@ class Network():
         """
         parameters = {
 
-          'layer2D_1' : self._layer2D_1,
-          'layer2D_2' : self._layer2D_2,
+          'layer_2D_1' : self._layer_2D_1,
+          'layer_2D_2' : self._layer_2D_2,
           'loss' : self._loss,
           'output_activation' : self._output_activation,
           'optimizer' : self._optimizer,
@@ -94,8 +91,8 @@ def create_model(network):
 
     parameters = network.get_parameters()
 
-    layer2D_1 = parameters['layer2D_1']
-    layer2D_2 = parameters['layer2D_2']
+    layer_2D_1 = parameters['layer_2D_1']
+    layer_2D_2 = parameters['layer_2D_2']
     loss = parameters['loss']
     output_activation = parameters['output_activation']
     optimizer = parameters['optimizer']
@@ -103,10 +100,12 @@ def create_model(network):
 
     model = Sequential()
     model.add(InputLayer(input_shape=input_shape))
-    model.add(Conv2D(layer2D_1[0], kernel_size=layer2D_1[1], strides=layer2D_1[2], padding=layer2D_1[3], activation=layer2D_1[5]))
-    model.add(Dropout(layer2D_1[4]))
-    model.add(Conv2D(layer2D_2[0], kernel_size=layer2D_2[1], strides=layer2D_2[2], padding=layer2D_2[3], activation=layer2D_1[5]))
-    model.add(Dropout(layer2D_2[4])
+    model.add(Conv2D(layer_2D_1[0], kernel_size=layer_2D_1[1], strides=layer_2D_1[2],
+                     padding=layer_2D_1[3], activation=layer_2D_1[5]))
+    model.add(Dropout(layer_2D_1[4]))
+    model.add(Conv2D(layer_2D_2[0], kernel_size=layer_2D_2[1], strides=layer_2D_2[2],
+                     padding=layer_2D_2[3], activation=layer_2D_1[5]))
+    model.add(Dropout(layer_2D_2[4])
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(Flatten())
     model.add(Dense(no_classes, activation=output_activation))
@@ -141,28 +140,26 @@ def rearrange_networks(networks):
             offspring1._genetic_function = 1
             offspring2._genetic_function = 1
             # rearrage layers
-            offspring1._layer2D_1, offspring1._layer2D_2 = parent1._layer2D_1, parent2._layer2D_2
-            offspring2._layer2D_1, offspring2._layer2D_2 = parent2._layer2D_1, parent1._layer2D_2
+            offspring1._layer_2D_1, offspring1._layer_2D_2 = parent1._layer_2D_1, parent2._layer_2D_2
+            offspring2._layer_2D_1, offspring2._layer_2D_2 = parent2._layer_2D_1, parent1._layer_2D_2
+            # rearrage epochs and optimizer
+            offspring1._epochs, offspring2._epochs = parent1._epochs, parent2._epochs
+            offspring1._optimizer, offspring2._optimizer = parent2._optimizer, parent1._optimizer
 
         else:
             offspring1._genetic_function = 2
             offspring2._genetic_function = 2
             #exchange parameters from the first with those of the second layer, that is: units, kernel, stride, padding, dropout, hidden_activation
-            for layer in offspring1._layers2D:
-                layer[0] = random.choice([parent1._layer2D_1[0], parent1._layer2D_2[0], parent2._layer2D_1[0], parent2._layer2D_2[0]])
-                layer[1] = random.choice([parent1._layer2D_1[1], parent1._layer2D_2[1], parent2._layer2D_1[1], parent2._layer2D_2[1]])
-                layer[2] = random.choice([parent1._layer2D_1[2], parent1._layer2D_2[2], parent2._layer2D_1[2], parent2._layer2D_2[2]])
-                layer[3] = random.choice([parent1._layer2D_1[3], parent1._layer2D_2[3], parent2._layer2D_1[3], parent2._layer2D_2[3]])
-                layer[4] = random.choice([parent1._layer2D_1[4], parent1._layer2D_2[4], parent2._layer2D_1[4], parent2._layer2D_2[4]])
-                layer[5] = random.choice([parent1._layer2D_1[5], parent1._layer2D_2[5], parent2._layer2D_1[5], parent2._layer2D_2[5]])
+            for layer in offspring1._layers_2D:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
 
-            for layer in offspring2._layers2D:
-                layer[0] = random.choice([parent1._layer2D_1[0], parent1._layer2D_2[0], parent2._layer2D_1[0], parent2._layer2D_2[0]])
-                layer[1] = random.choice([parent1._layer2D_1[1], parent1._layer2D_2[1], parent2._layer2D_1[1], parent2._layer2D_2[1]])
-                layer[2] = random.choice([parent1._layer2D_1[2], parent1._layer2D_2[2], parent2._layer2D_1[2], parent2._layer2D_2[2]])
-                layer[3] = random.choice([parent1._layer2D_1[3], parent1._layer2D_2[3], parent2._layer2D_1[3], parent2._layer2D_2[3]])
-                layer[4] = random.choice([parent1._layer2D_1[4], parent1._layer2D_2[4], parent2._layer2D_1[4], parent2._layer2D_2[4]])
-                layer[5] = random.choice([parent1._layer2D_1[5], parent1._layer2D_2[5], parent2._layer2D_1[5], parent2._layer2D_2[5]])
+            for layer in offspring2._layers_2D:
+                for i in range(len(layer)):
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
+        # rearrage epochs and optimizer
+        offspring1._epochs, offspring2._epochs = parent1._epochs, parent2._epochs
+        offspring1._optimizer, offspring2._optimizer = parent2._optimizer, parent1._optimizer
 
         offsprings.append(offspring1)
         offsprings.append(offspring2)
@@ -176,7 +173,7 @@ def mutate_network(networks):
     randomly renders individual parameters in 10% of all cases
     """
     for network in networks:
-        for layer in network._layers2D:
+        for layer in network._layers_2D:
             if np.random.uniform(0, 1) <= 0.1:
                 # mutate units
                 layer[0] += np.random.randint(-2, 4)*16
@@ -212,7 +209,7 @@ def optimizer():
         total_accuracy = 0
         networks = assess_networks(networks)
         for network in networks:
-          total_accuracy += network._accuracy
+            total_accuracy += network._accuracy
 
         networks = select_best_networks(networks)
         networks = rearrange_networks(networks)
@@ -222,23 +219,23 @@ def optimizer():
         networks_accuracy.append(average_accuracy)
 
         for network in networks:
-          if network._accuracy > best_network_accuracy:
-              best_network_accuracy = network._accuracy
-              best_network = network
-              logging.info(best_network.__dict__.items())
-              print('current best accuracy: ' +str(best_network_accuracy))
+            if network._accuracy > best_network_accuracy:
+                best_network_accuracy = network._accuracy
+                best_network = network
+                logging.info(best_network.__dict__.items())
+                print('current best accuracy: ' +str(best_network_accuracy))
 
-          if network._accuracy > threshold:
-              print ('Threshold met')
-              print (network.__dict__.items())
-              print ('Best accuracy: {}'.format(network._accuracy))
-              logging.info(network.__dict__.items())
-              exit(0)
+            if network._accuracy > threshold:
+                print('Threshold met')
+                print(network.__dict__.items())
+                print('Best accuracy: {}'.format(network._accuracy))
+                logging.info(network.__dict__.items())
+                exit(0)
         # Print out the average accuracy each generation.
         logging.info("Generation average: %.2f%%" % (average_accuracy*100))
         logging.info('-'*80)
         logging.info("***Doing generation %d of %d***" %
-          (generation + 1, generations))
+                     (generation + 1, generations))
 
 
     return networks, networks_accuracy, best_network
@@ -246,4 +243,4 @@ def optimizer():
                  (generations, population))
 
 if __name__ == '__main__':
-  networks, networks_accuracy, best_network = optimizer()
+    networks, networks_accuracy, best_network = optimizer()
