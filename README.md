@@ -38,5 +38,9 @@ parameters that are fixed (for now):
 ![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/NeuralNet_opt_output.png)
 
 
+### to do:
+- implement a random number of layers
+- include other datasets for optimization liek MNIST
+
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
 https://blog.coast.ai/lets-evolve-a-neural-network-with-a-genetic-algorithm-code-included-8809bece164
