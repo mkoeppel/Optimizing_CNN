@@ -27,8 +27,8 @@ no_classes = 10
 batch_size = 300
 validation_split = 0.2
 threshold = 0.8
-population = 25
-generations = 20
+population = 10
+generations = 2
 input_shape = (32, 32, 3)
 
 
@@ -79,10 +79,8 @@ class Network():
         provides a dictionary of prarameters for each instantce of Network
         """
         parameters = {
-            'layer_2D_1' : self._layer_2D_1,
-            'layer_2D_2' : self._layer_2D_2,
-            'layer_dense_1' : self._layer_dense_1,
-            'layer_dense_2' : self._layer_dense_2,
+            'layers_2D' : self._layers_2D,
+            'layers_dense' : self._layers_dense,
             'loss' : self._loss,
             'output_activation' : self._output_activation,
             'optimizer' : self._optimizer,
@@ -102,11 +100,12 @@ def create_model(network):
     """
 
     parameters = network.get_parameters()
-
-    layer_2D_1 = parameters['layer_2D_1']
-    layer_2D_2 = parameters['layer_2D_2']
-    layer_dense_1 = parameters['layer_dense_1']
-    layer_dense_2 = parameters['layer_dense_2']
+    layers_2D = parameters['layers_2D']
+    layer_2D_1 = layers_2D[0]
+    layer_2D_2 = layers_2D[1]
+    layers_dense = parameters['layers_dense']
+    layer_dense_1 = layers_dense[0]
+    layer_dense_2 = layers_dense[1]
 
     loss = parameters['loss']
     output_activation = parameters['output_activation']
@@ -174,11 +173,13 @@ def rearrange_networks(networks):
             # randomly exchange parameters from parental layers
             for layer in offspring1._layers_2D:
                 for i in range(len(layer)):
-                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i],
+                                              parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
 
             for layer in offspring2._layers_2D:
                 for i in range(len(layer)):
-                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i], parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
+                    layer[i] = random.choice([parent1._layer_2D_1[i], parent1._layer_2D_2[i],
+                                              parent2._layer_2D_1[i], parent2._layer_2D_2[i]])
 
             for layer in offspring1._layers_dense:
                 for i in range(len(layer)):
@@ -233,7 +234,7 @@ def mutate_network(networks):
     return networks
 
 
-(train_images, train_labels), (test_images, test_labels) = prepare_data(dataset)
+(train_images, train_labels), (test_images, test_labels) = helper_functions.prepare_data(dataset)
 
 def optimizer():
     """
@@ -247,11 +248,11 @@ def optimizer():
     for generation in range(generations):
         print(f'Generation number {generation}')
         total_accuracy = 0
-        networks = assess_networks(networks)
+        networks = helper_functions.assess_networks(networks)
         for network in networks:
             total_accuracy += network._accuracy
 
-        networks = select_best_networks(networks)
+        networks = helper_functions.select_best_networks(networks)
         networks = rearrange_networks(networks)
         networks = mutate_network(networks)
 

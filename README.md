@@ -1,4 +1,7 @@
 # Optimizing_Neural_Nets
+Giving large enough datasets, artificial neural networks train themselves in order to become better at a given task. Yet, several hyperparameters need to be provided by the user beforehand and frequently need adjustment to obtain the desired output.
+A possible alternative to such manual and user-defined adjustments are genetic algorithms, which allow a more automated and unbiased selection of best-performing hyperparameters:
+
 Mimicking biologic evolutionary processes, this project adapts, recombines, and mutates hyperparameters from best-performing neural networks within a given population.
 
 It performs an initial random initialization of hyperparameters for a population of neural networks and tests their learning on the cifar10 dataset.
@@ -32,12 +35,8 @@ parameters that are fixed (for now):
 
 
 ##### an example result from optimizing only the conv2D-layers for 30 generations with a population size of 20:
-![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/Conv2D_opt_output.png)
+![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/NeuralNet_opt_output.png)
 
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
 https://blog.coast.ai/lets-evolve-a-neural-network-with-a-genetic-algorithm-code-included-8809bece164
-
-
-
-
