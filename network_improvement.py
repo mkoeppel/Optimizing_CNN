@@ -234,7 +234,7 @@ def mutate_network(networks):
     return networks
 
 
-(train_images, train_labels), (test_images, test_labels) = helper_functions.prepare_data(dataset)
+(train_images, train_labels), (test_images, test_labels) = prepare_data(dataset)
 
 def optimizer():
     """
@@ -248,11 +248,11 @@ def optimizer():
     for generation in range(generations):
         print(f'Generation number {generation}')
         total_accuracy = 0
-        networks = helper_functions.assess_networks(networks)
+        networks = assess_networks(networks)
         for network in networks:
             total_accuracy += network._accuracy
 
-        networks = helper_functions.select_best_networks(networks)
+        networks = select_best_networks(networks)
         networks = rearrange_networks(networks)
         networks = mutate_network(networks)
 
