@@ -28,15 +28,6 @@ def test_rearrangement():
     parents_parameters = parents[0].get_parameters()
     assert parents_parameters.items() != offspring_parameters.items()
 
-def test_mutation():
-    networks = init_networks(2)
-    networks_mut = networks.copy()
-    network_parameters = networks[0].get_parameters()
-    for i in range(10):
-        networks_mut = mutate_network(networks_mut)
-    mut_parameters = networks_mut[0].get_parameters()
-    assert network_parameters.items() != mut_parameters.items()
-
 
 
 def test_sanity():
