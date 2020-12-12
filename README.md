@@ -20,6 +20,7 @@ This performance-testing and rearranging of hyperparameters is done for > 20 rou
 This is the first version of an optimizing algorithm, keeping several hyperparameters set, while giving some flexibility for selective advantages to several others:
 
 flexible hyperparameters are:
+- random number of layers (both 2D- and dense- layers)
 - number of units per layer
 - dropout-rate per layer
 - kernel- and stride size for the conv-layers
@@ -29,8 +30,7 @@ flexible hyperparameters are:
 - optimizer: rmsprop, adam, sgd, adagrad
 
 parameters that are fixed (for now):
-- number of conv-layers: 2
-- number of dense layers: 2 (3 in network_improvement_DenseOnly.py)
+
 - output activation function: softmax
 - loss-function: categorical_crossentropy
 - batch_size: 300
@@ -41,8 +41,8 @@ parameters that are fixed (for now):
 
 
 ### to do:
-- implement a random number of layers
-- include other datasets for optimization liek MNIST
+~~- implement a random number of layers ~~
+- include other datasets for optimization like MNIST
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
 https://blog.coast.ai/lets-evolve-a-neural-network-with-a-genetic-algorithm-code-included-8809bece164
