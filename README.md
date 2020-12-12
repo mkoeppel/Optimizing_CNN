@@ -11,7 +11,7 @@ It performs an initial random initialization of hyperparameters for a population
 Subsequently, it selects the 20% best performing networks and generates offspring-networks be rearranging hyperparameters.
 Two different ways are possible for rearranging parental layers and parameters for inclusion in offsprings:
 - inheritance of complete layers: layers from the both parental networks are combined, so one from each into each offspring (resembling the shuffling of whole chromosomes in biology)
-~~- crossover of parameters: parental parameters are randomly chosen and included in the offsprings (resembling homologues recombination during meiosis)~~ this second option is currently inactive 
+- ~~crossover of parameters: parental parameters are randomly chosen and included in the offsprings (resembling homologues recombination during meiosis)~~ this second option is currently inactive 
 
 Afterwards (numeric) parameters have a 10% chance of being additionally rendered by a small value (resembling genetic point-mutations)
 
@@ -41,7 +41,7 @@ parameters that are fixed (for now):
 
 
 ### to do:
-~~- implement a random number of layers~~
+- ~~implement a random number of layers~~
 - include other datasets for optimization like MNIST
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
