@@ -1,6 +1,6 @@
 ![alt text](https://travis-ci.org/mkoeppel/Optimizing_neural_nets.svg?branch=main)
 
-# Optimizing_Neural_Nets
+# Optimizing_Neural_Nets 
 Giving large enough datasets, artificial neural networks train themselves in order to become better at a given task. Yet, several hyperparameters need to be provided by the user beforehand and frequently need adjustment to obtain the desired output.
 A possible alternative to such manual and user-defined adjustments are genetic algorithms, which allow a more automated and unbiased selection of best-performing hyperparameters:
 
