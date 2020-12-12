@@ -41,7 +41,7 @@ parameters that are fixed (for now):
 
 
 ### to do:
-~~- implement a random number of layers ~~
+~~- implement a random number of layers~~
 - include other datasets for optimization like MNIST
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
