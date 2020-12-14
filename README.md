@@ -1,6 +1,6 @@
 ![alt text](https://travis-ci.org/mkoeppel/Optimizing_neural_nets.svg?branch=main)
 
-# Optimizing_Neural_Nets
+# Optimizing_Neural_Nets 
 Giving large enough datasets, artificial neural networks train themselves in order to become better at a given task. Yet, several hyperparameters need to be provided by the user beforehand and frequently need adjustment to obtain the desired output.
 A possible alternative to such manual and user-defined adjustments are genetic algorithms, which allow a more automated and unbiased selection of best-performing hyperparameters:
 
@@ -11,7 +11,7 @@ It performs an initial random initialization of hyperparameters for a population
 Subsequently, it selects the 20% best performing networks and generates offspring-networks be rearranging hyperparameters.
 Two different ways are possible for rearranging parental layers and parameters for inclusion in offsprings:
 - inheritance of complete layers: layers from the both parental networks are combined, so one from each into each offspring (resembling the shuffling of whole chromosomes in biology)
-- crossover of parameters: parental parameters are randomly chosen and included in the offsprings (resembling homologues recombination during meiosis)
+- ~~crossover of parameters: parental parameters are randomly chosen and included in the offsprings (resembling homologues recombination during meiosis)~~ this second option is currently inactive 
 
 Afterwards (numeric) parameters have a 10% chance of being additionally rendered by a small value (resembling genetic point-mutations)
 
@@ -20,6 +20,7 @@ This performance-testing and rearranging of hyperparameters is done for > 20 rou
 This is the first version of an optimizing algorithm, keeping several hyperparameters set, while giving some flexibility for selective advantages to several others:
 
 flexible hyperparameters are:
+- random number of layers (both 2D- and dense- layers)
 - number of units per layer
 - dropout-rate per layer
 - kernel- and stride size for the conv-layers
@@ -29,8 +30,7 @@ flexible hyperparameters are:
 - optimizer: rmsprop, adam, sgd, adagrad
 
 parameters that are fixed (for now):
-- number of conv-layers: 2
-- number of dense layers: 2 (3 in network_improvement_DenseOnly.py)
+
 - output activation function: softmax
 - loss-function: categorical_crossentropy
 - batch_size: 300
@@ -41,8 +41,8 @@ parameters that are fixed (for now):
 
 
 ### to do:
-- implement a random number of layers
-- include other datasets for optimization liek MNIST
+- ~~implement a random number of layers~~
+- include other datasets for optimization like MNIST
 
 This is a follow-up to the deep-learning week at the Data Science bootcamp at SPICED Academy and was inspired and guided by this blog-post:
 https://blog.coast.ai/lets-evolve-a-neural-network-with-a-genetic-algorithm-code-included-8809bece164
