@@ -36,6 +36,10 @@ parameters that are fixed (for now):
 - batch_size: 300
 
 
+##### architecture of the bset performing net after 20 generations:
+![alt.text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/best_performing_net.jpeg)
+
+
 ##### an example result from optimizing a neural net with 2 conv2D and 2 dense layers for 20 generations with a population size of 25:
 ![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/NeuralNet_opt_output.png)
 
