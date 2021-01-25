@@ -36,7 +36,7 @@ parameters that are fixed (for now):
 - batch_size: 300
 
 
-##### architecture of the bset performing net after 20 generations:
+##### architecture of the best performing net after 20 generations:
 ![alt.text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/best_performing_net.jpeg)
 
 
