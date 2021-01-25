@@ -28,7 +28,6 @@ logging.basicConfig(
 )
 
 
-### move this to another file
 DATASET = cifar10
 NUM_CLASSES = 10
 BATCH_SIZE = 300
