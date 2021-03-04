@@ -6,7 +6,10 @@ A possible alternative to such manual and user-defined adjustments are genetic a
 
 Mimicking biologic evolutionary processes, this project adapts, recombines, and mutates hyperparameters from best-performing neural networks within a given population.
 
-It performs an initial random initialization of hyperparameters for a population of neural networks and tests their learning on the cifar10 dataset.
+#### used tech:
+![alt text](https://github.com/mkoeppel/Optimizing_neural_nets/blob/main/Tech_stack_opt_nets.jpeg)
+
+The process starts with a random initialization of hyperparameters for a population of neural networks and tests their learning on the cifar10 dataset.
 
 Subsequently, it selects the 20% best performing networks and generates offspring-networks be rearranging hyperparameters.
 Two different ways are possible for rearranging parental layers and parameters for inclusion in offsprings:
