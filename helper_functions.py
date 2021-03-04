@@ -39,7 +39,9 @@ def create_model(network):
     model = Sequential()
     model.add(InputLayer(input_shape=INPUT_SHAPE))
 
-    for layer in parameters["layers_2D"]:
+    counter = 0
+    for layer in parameters["layers_2D
+        counter += 1
         model.add(
             Conv2D(
                 filters=parameters["layers_2D"].get(layer).get("units"),
@@ -51,8 +53,8 @@ def create_model(network):
         )
 
         model.add(Dropout(parameters["layers_2D"].get(layer).get("dropout")))
-
-    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+        if counter % 3 == 0 or counter == len(parameters['layers_2D'].keys()):
+            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
     model.add(Flatten())
 
     for layer in parameters["layers_dense"]:
